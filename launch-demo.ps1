@@ -15,10 +15,12 @@ function Get-DevContainerUri($configFilePath) {
 }
 
 # Rancher Desktop specific check
-$dockerPath = "C:\Users\mp0236\AppData\Local\Programs\Rancher Desktop\resources\resources\win32\bin"
-if ($env:PATH -notlike "*$dockerPath*") {
-    Write-Host "[Info] Adding Rancher Desktop bin to PATH for this session..." -ForegroundColor Gray
-    $env:PATH = "$dockerPath;$env:PATH"
+$dockerPath = Join-Path $env:LOCALAPPDATA "Programs\Rancher Desktop\resources\resources\win32\bin"
+if (Test-Path $dockerPath) {
+    if ($env:PATH -notlike "*$dockerPath*") {
+        Write-Host "[Info] Adding Rancher Desktop bin to PATH for this session..." -ForegroundColor Gray
+        $env:PATH = "$dockerPath;$env:PATH"
+    }
 }
 
 # 1. Launch Java 17 Context

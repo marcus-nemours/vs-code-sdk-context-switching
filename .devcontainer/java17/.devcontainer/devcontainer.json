@@ -1,7 +1,7 @@
 {
   "name": "Java 17 Research",
   "image": "mcr.microsoft.com/devcontainers/java:17-bullseye",
-  "workspaceMount": "type=bind,source=/mnt/c/source/prototypes/vs-code-sdk-context-switching,target=/workspaces/vs-code-sdk-context-switching",
+  "workspaceMount": "type=bind,source=${localWorkspaceFolder}/../..,target=/workspaces/vs-code-sdk-context-switching",
   "workspaceFolder": "/workspaces/vs-code-sdk-context-switching",
   "customizations": {
     "vscode": {

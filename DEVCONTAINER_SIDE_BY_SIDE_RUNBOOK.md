@@ -36,7 +36,7 @@ Both context folders include a nested config file:
 
 These wrappers explicitly set:
 - `image` (17 or 21)
-- `workspaceMount` to `/mnt/c/source/prototypes/vs-code-sdk-context-switching`
+- `workspaceMount` to `source=${localWorkspaceFolder}/../..`
 - `workspaceFolder` to `/workspaces/vs-code-sdk-context-switching`
 
 This avoids config-resolution and mount-path issues seen during troubleshooting.
