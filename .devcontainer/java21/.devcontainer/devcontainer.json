@@ -1,0 +1,13 @@
+{
+  "name": "Java 21 Research",
+  "image": "mcr.microsoft.com/devcontainers/java:21-bullseye",
+  "workspaceMount": "type=bind,source=/mnt/c/source/prototypes/vs-code-sdk-context-switching,target=/workspaces/vs-code-sdk-context-switching",
+  "workspaceFolder": "/workspaces/vs-code-sdk-context-switching",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack"
+      ]
+    }
+  }
+}

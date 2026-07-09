@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev Containers Runbook - Version-Aware IntelliSense</title>
+    <style>
+        :root {
+            --ink: #14213d;
+            --ink-soft: #33415c;
+            --bg: #f6f8fb;
+            --panel: #ffffff;
+            --line: #dbe2ea;
+            --accent: #0b6e4f;
+            --accent-soft: #e8f7f1;
+            --warn: #b45309;
+            --warn-soft: #fff4e5;
+            --code: #0f172a;
+            --radius: 14px;
+            --shadow: 0 10px 30px rgba(20, 33, 61, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            background:
+                radial-gradient(1200px 400px at 10% -10%, #d8eef6 0%, transparent 70%),
+                radial-gradient(1000px 300px at 90% -15%, #e9f8ef 0%, transparent 70%),
+                var(--bg);
+            font-family: "Segoe UI", "Aptos", "Trebuchet MS", sans-serif;
+            line-height: 1.5;
+        }
+
+        .wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 28px 20px 60px;
+        }
+
+        .hero {
+            background: linear-gradient(120deg, #12284a, #0b6e4f);
+            color: #fff;
+            border-radius: var(--radius);
+            padding: 28px;
+            box-shadow: var(--shadow);
+            margin-bottom: 18px;
+        }
+
+        .hero h1 {
+            margin: 0 0 10px;
+            font-size: clamp(1.5rem, 2.4vw, 2.2rem);
+            letter-spacing: 0.2px;
+        }
+
+        .hero p {
+            margin: 0;
+            max-width: 900px;
+            color: #d8e8ff;
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .chip {
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            color: #fff;
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 18px;
+            box-shadow: var(--shadow);
+            scroll-margin-top: 24px;
+        }
+
+        .toc {
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+
+        .toc h2 {
+            margin: 0 0 10px;
+            font-size: 1rem;
+        }
+
+        .toc ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .toc a {
+            display: block;
+            text-decoration: none;
+            color: var(--ink);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: #f8fbff;
+            padding: 9px 10px;
+            font-size: 0.93rem;
+            font-weight: 600;
+        }
+
+        .toc a:hover {
+            border-color: #8eb6ff;
+            background: #eef4ff;
+        }
+
+        h2 {
+            margin: 0 0 12px;
+            font-size: 1.15rem;
+            color: var(--ink);
+        }
+
+        h3 {
+            margin: 14px 0 8px;
+            font-size: 1rem;
+            color: var(--ink-soft);
+        }
+
+        ul {
+            margin: 8px 0 0 20px;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 6px;
+        }
+
+        .kpi {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .kpi > div {
+            background: #f8fbff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .kpi strong {
+            display: block;
+            font-size: 1.05rem;
+            color: var(--accent);
+            margin-bottom: 2px;
+        }
+
+        .code {
+            margin: 10px 0;
+            background: #0b1220;
+            color: #f3f7ff;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-family: Consolas, "Courier New", monospace;
+            overflow-x: auto;
+            border: 1px solid #1e2e4a;
+        }
+
+        .callout {
+            border-radius: 10px;
+            padding: 11px 12px;
+            margin-top: 10px;
+            border: 1px solid;
+        }
+
+        .callout.ok {
+            background: var(--accent-soft);
+            border-color: #b8e7d5;
+            color: #0b3c2d;
+        }
+
+        .callout.warn {
+            background: var(--warn-soft);
+            border-color: #f7d7b0;
+            color: #6f3f05;
+        }
+
+        .callout.major {
+            background: #eef5ff;
+            border-color: #bfd7ff;
+            color: #143e7a;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            font-size: 0.95rem;
+        }
+
+        th,
+        td {
+            border: 1px solid var(--line);
+            padding: 9px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #f2f7fc;
+        }
+
+        .evidence-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        figure {
+            margin: 0;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: var(--shadow);
+        }
+
+        figure img {
+            width: 100%;
+            display: block;
+            background: #f2f5f9;
+        }
+
+        figcaption {
+            font-size: 0.9rem;
+            padding: 9px 10px;
+            color: var(--ink-soft);
+            border-top: 1px solid var(--line);
+            background: #fafcff;
+        }
+
+        .footer {
+            margin-top: 14px;
+            font-size: 0.9rem;
+            color: #51627f;
+        }
+
+        @media (max-width: 930px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .evidence-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi {
+                grid-template-columns: 1fr;
+            }
+
+            .toc ul {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <header class="hero">
+            <h1>Dev Container Side-by-Side Runbook</h1>
+            <p>
+                Professional reference for running different Java versions in parallel with isolated IntelliSense and predictable startup behavior in VS Code.
+            </p>
+            <div class="chips">
+                <span class="chip">Two VS Code windows</span>
+                <span class="chip">Container-isolated Java language server</span>
+                <span class="chip">Validated with runtime + IntelliSense checks</span>
+                <span class="chip">Demo examples: Java 17 and Java 21</span>
+            </div>
+        </header>
+
+        <nav class="toc" aria-label="Table of contents">
+            <h2>Quick Navigation</h2>
+            <ul>
+                <li><a href="#outcome-summary">Outcome Summary</a></li>
+                <li><a href="#required-configuration">Required Configuration</a></li>
+                <li><a href="#validation-procedure">Validation Procedure</a></li>
+                <li><a href="#screenshot-evidence">Screenshot Evidence</a></li>
+                <li><a href="#known-risk-recovery">Known Risk and Recovery</a></li>
+                <li><a href="#footer-notes">Document Notes</a></li>
+            </ul>
+        </nav>
+
+        <section class="grid">
+            <article class="panel" id="outcome-summary">
+                <h2>Outcome Summary</h2>
+                <ul>
+                    <li>Both Java contexts launch from a single script.</li>
+                    <li>Each window attaches to its own container image.</li>
+                    <li>Java version and API intelligence are correctly isolated.</li>
+                    <li>Pattern is reusable for any supported version pair.</li>
+                </ul>
+
+                <div class="kpi">
+                    <div>
+                        <strong>Java 17</strong>
+                        Separate runtime + IntelliSense behavior
+                    </div>
+                    <div>
+                        <strong>Java 21</strong>
+                        Separate runtime + IntelliSense behavior
+                    </div>
+                    <div>
+                        <strong>2 Windows</strong>
+                        Side by side, no SDK conflict
+                    </div>
+                </div>
+
+                <h3>Launch Script</h3>
+                <div class="code">./launch-demo.ps1</div>
+
+                <h3>Context Paths</h3>
+                <ul>
+                    <li>.devcontainer/java17</li>
+                    <li>.devcontainer/java21</li>
+                </ul>
+
+                <div class="callout major">
+                    <strong>Major Benefit:</strong> Host JDK installation is not required. Compile, run, and IntelliSense use the JDK inside each container.
+                </div>
+            </article>
+
+            <article class="panel" id="required-configuration">
+                <h2>Required Configuration</h2>
+                <h3>Dev Container wrappers</h3>
+                <ul>
+                    <li>.devcontainer/java17/.devcontainer/devcontainer.json</li>
+                    <li>.devcontainer/java21/.devcontainer/devcontainer.json</li>
+                </ul>
+                <p>Each wrapper defines image, workspace mount, and workspace folder for stable resolution.</p>
+
+                <h3>Host settings alignment</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Setting</th>
+                            <th>Expected Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>dev.containers.dockerPath</td>
+                            <td>Rancher Desktop docker.exe path</td>
+                        </tr>
+                        <tr>
+                            <td>remote.containers.dockerPath</td>
+                            <td>Rancher Desktop docker.exe path</td>
+                        </tr>
+                        <tr>
+                            <td>dev.containers.executeInWSL</td>
+                            <td>false</td>
+                        </tr>
+                        <tr>
+                            <td>remote.containers.executeInWSL</td>
+                            <td>false</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </article>
+        </section>
+
+        <section class="panel" style="margin-bottom: 16px;" id="validation-procedure">
+            <h2>Validation Procedure</h2>
+            <p>This procedure is version-agnostic. Java 17 and Java 21 are used below as demo examples.</p>
+            <h3>Step 1: Runtime check</h3>
+            <p>Run in each container terminal:</p>
+            <div class="code">java -version</div>
+            <ul>
+                <li>Example A (Java 17 demo) should report version 17.</li>
+                <li>Example B (Java 21 demo) should report version 21.</li>
+            </ul>
+
+            <h3>Step 2: IntelliSense split check</h3>
+            <p>Use this exact line in both windows:</p>
+            <div class="code">List.of(1,2,3).reversed();</div>
+            <ul>
+                <li>Example A (Java 17 demo): reversed() should be undefined (error).</li>
+                <li>Example B (Java 21 demo): reversed() should be supported (no error).</li>
+            </ul>
+
+            <div class="callout ok">
+                This pair of checks confirms both runtime and language tooling are bound to the correct container context.
+            </div>
+        </section>
+
+        <section class="panel" style="margin-bottom: 16px;" id="screenshot-evidence">
+            <h2>Screenshot Evidence</h2>
+            <p>Evidence shown below is from the Java 17/21 demo pair to illustrate the general approach.</p>
+            <div class="evidence-grid">
+                <figure>
+                    <img src="docs/images/java17-runtime-version.png" alt="Java 17 runtime version screenshot">
+                    <figcaption>Java 17 runtime verification</figcaption>
+                </figure>
+                <figure>
+                    <img src="docs/images/java21-runtime-version.png" alt="Java 21 runtime version screenshot">
+                    <figcaption>Java 21 runtime verification</figcaption>
+                </figure>
+                <figure>
+                    <img src="docs/images/java17-intellisense-reversed-undefined.png" alt="Java 17 IntelliSense reversed undefined screenshot">
+                    <figcaption>Java 17 IntelliSense: reversed() undefined</figcaption>
+                </figure>
+                <figure>
+                    <img src="docs/images/java21-intellisense-reversed-supported.png" alt="Java 21 IntelliSense reversed supported screenshot">
+                    <figcaption>Java 21 IntelliSense: reversed() supported</figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <section class="panel" id="known-risk-recovery">
+            <h2>Known Risk and Recovery</h2>
+            <div class="callout warn">
+                Rancher Desktop backend instability can break launches even when repository configuration is correct.
+            </div>
+            <ol>
+                <li>Confirm Rancher Desktop is fully started.</li>
+                <li>Validate Docker health with docker.exe version.</li>
+                <li>Rerun launch-demo.ps1.</li>
+            </ol>
+        </section>
+
+        <section class="panel" style="margin-top: 16px;">
+            <h2>Host Machine Requirements</h2>
+            <ul>
+                <li>No host JDK install is needed for this approach.</li>
+                <li>Required: Docker runtime (for example Rancher Desktop).</li>
+                <li>Required: VS Code with Dev Containers extension.</li>
+            </ul>
+            <p>JDK lifecycle management is handled in container images/configuration, not on the host.</p>
+        </section>
+
+        <p class="footer" id="footer-notes">Documentation generated from validated project state and captured session evidence.</p>
+    </div>
+</body>
+</html>

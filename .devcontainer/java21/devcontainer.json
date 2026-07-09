@@ -1,0 +1,11 @@
+{
+    "name": "Java 21 Research",
+    "image": "mcr.microsoft.com/devcontainers/java:21-bullseye",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "vscjava.vscode-java-pack"
+            ]
+        }
+    }
+}
