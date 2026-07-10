@@ -13,31 +13,24 @@ Reference project showing how to run different Java versions side-by-side in VS 
 
 These are examples only; the approach is version-agnostic.
 
-## Quick start
-1. Ensure Rancher Desktop (or Docker runtime) is running.
-2. Open this repo in VS Code with Dev Containers extension installed.
-3. Run:
+## Quick Start
+1. **Clone** the repo.
+2. **Ensure** Rancher Desktop (or Docker runtime) is running.
+3. **Run** the launcher script in PowerShell:
+   ```powershell
+   ./launch-demo.ps1
+   ```
+4. **Watch** two isolated Java worlds appear!
 
-```powershell
-./launch-demo.ps1
-```
+Each window will attach to its own container with its own Java version (17 and 21) automatically.
 
-4. In each window terminal, run:
-
-```bash
-java -version
-```
-
-## IntelliSense validation test
+## Validation Test (Isolation Check)
 Use this line in both windows:
-
 ```java
 List.of(1,2,3).reversed();
 ```
-
-Expected behavior:
-- Older example version (Java 17): `reversed()` is undefined.
-- Newer example version (Java 21): `reversed()` is supported.
+- **Java 17 Window:** `reversed()` shows a red squiggle (deprecated/unsupported).
+- **Java 21 Window:** Works perfectly.
 
 ## Documentation
 - Runbook: [DEVCONTAINER_SIDE_BY_SIDE_RUNBOOK.md](DEVCONTAINER_SIDE_BY_SIDE_RUNBOOK.md)
